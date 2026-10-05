@@ -1,44 +1,49 @@
-# 计算器系统 · 前端（Calculator Frontend）
+# Calculator Frontend
 
-前后端分离的在线计算器系统的**可视化客户端**，使用原生 HTML / CSS / JavaScript 实现，
-不依赖任何构建工具，双击页面即可运行。
+Client application of an online calculator built with a front-end / back-end separated
+architecture. It is written in plain HTML, CSS and JavaScript and requires no build step:
+opening the page in a browser is enough.
 
-> 配套后端仓库：见博客中的「后端 GitHub 仓库」链接。
+> The matching back-end repository is linked in the assignment blog post.
 
-## 一、项目介绍
+## 1. Overview
 
-本页面是计算器系统的用户界面，只负责三件事：
+The page is responsible for exactly three things:
 
-1. **输入**：提供计算器按键与表达式输入框；
-2. **请求**：把用户输入的表达式原样发送给后端 API；
-3. **展示**：把后端返回的计算结果、历史记录、错误信息展示给用户。
+1. **Input** — provide the keypad and the expression field;
+2. **Request** — send the expression the user typed to the back-end API unchanged;
+3. **Present** — display the result, the history and the error messages that come back.
 
-页面**不包含任何数学运算逻辑**。如果把后端服务停掉，界面仍可正常交互，
-但无法得到任何新的计算结果——这正是前后端分离的验证方式。
+The page contains **no arithmetic logic whatsoever**. If the back-end service is stopped
+the interface remains usable, but it cannot produce a new result. That is precisely the
+verification method described in the assignment.
 
-## 二、技术栈
+## 2. Technology Stack
 
-| 项目 | 选型 |
+| Item | Choice |
 | --- | --- |
-| 结构 | 原生 HTML5（`src/calculator.html`） |
-| 样式 | 原生 CSS3，CSS 变量实现主题切换，类名遵循 BEM 规范 |
-| 逻辑 | 原生 JavaScript（ES2017+，`async/await`），无框架、无构建工具 |
-| 通信 | `fetch` 调用后端 RESTful API（JSON over HTTP） |
+| Markup | Plain HTML5 (`src/calculator.html`) |
+| Styling | Plain CSS3 with CSS custom properties for theming, BEM class names |
+| Behaviour | Plain JavaScript (ES2017, `async` / `await`), no framework and no build tool |
+| Communication | `fetch` against the back-end REST API (JSON over HTTP) |
 
-选择原生技术栈的原因：依赖为零，助教无需安装 Node.js 或任何包管理器，
-用浏览器直接打开即可评审，最符合「不应无必要地依赖特定本地环境」的要求。
+The plain stack was chosen because it has no dependencies at all. The reviewer does not
+need to install Node.js or any package manager; the page can simply be opened in a
+browser, which satisfies the requirement that the technology should not depend
+unnecessarily on a particular local environment.
 
-## 三、运行环境
+## 3. Requirements
 
-- 任意现代浏览器（Chrome / Edge / Firefox / Safari 均可）
-- 需要能访问后端服务（默认 `http://127.0.0.1:5000/api`）
-- 若通过 `file://` 直接打开页面遇到浏览器跨域限制，请按下面第四节的推荐方式启动本地静态服务
+- Any modern browser (Chrome, Edge, Firefox or Safari)
+- Network access to the back-end service (default `http://127.0.0.1:5000/api`)
+- If opening the file directly with `file://` triggers browser restrictions on
+  cross-origin requests, use the static server described below
 
-## 四、安装与启动
+## 4. Installation and Startup
 
-本项目无第三方依赖，**无需安装**。任选一种方式运行：
+There are no third-party dependencies and therefore nothing to install.
 
-### 方式一：使用本地静态服务器（推荐）
+### Option A: local static server (recommended)
 
 ```bash
 cd 24126942_calculator_frontend/src
@@ -46,127 +51,133 @@ cd 24126942_calculator_frontend/src
 # Python 3
 python -m http.server 8080
 
-# 或使用 Node.js
+# or with Node.js
 npx http-server -p 8080
 ```
 
-然后在浏览器中访问：
+Then open:
 
 ```
 http://127.0.0.1:8080/calculator.html
 ```
 
-### 方式二：直接用浏览器打开
+### Option B: open the file directly
 
-双击 `src/calculator.html` 即可。若浏览器限制 `file://` 页面的跨域请求，
-请改用方式一。
+Double-clicking `src/calculator.html` also works. If the browser blocks the cross-origin
+requests made from a `file://` page, use option A instead.
 
-> 使用前请先启动后端服务，否则页面会提示「后端未连接」。
+> The back-end service must be running, otherwise the page reports that the back end is
+> unavailable.
 
-## 五、配置说明
+## 5. Configuration
 
-后端地址配置在 [`src/js/config.js`](src/js/config.js) 中：
+The API address is configured in [`src/js/config.js`](src/js/config.js):
 
 ```js
 var DEFAULT_API_BASE = 'http://127.0.0.1:5000/api';
 ```
 
-如果后端部署在其他机器或端口，**无需修改代码**，在访问地址后追加 `?api=` 参数即可覆盖：
+If the API is hosted elsewhere there is **no need to edit the code**: append the `?api=`
+parameter to the page URL.
 
 ```
 http://127.0.0.1:8080/calculator.html?api=http://192.168.1.10:5000/api
 ```
 
-当前生效的接口地址会显示在页面右下角的「接口地址」处，方便排查问题。
+The address currently in use is displayed at the bottom right of the page, which makes
+troubleshooting much easier.
 
-## 六、前后端连接方式
+## 6. How the Two Parts Are Connected
 
 ```
-浏览器（calculator.html）
+Browser (calculator.html)
       |
       |  fetch + JSON
       v
-后端 API（http://127.0.0.1:5000/api）
+Back-end API (http://127.0.0.1:5000/api)
       |
       v
-SQLite 数据库
+SQLite database
 ```
 
-| 前端操作 | 调用的接口 |
+| Action in the interface | Endpoint that is called |
 | --- | --- |
-| 点击 `=` 或按 `Enter` | `POST /api/calculate` |
-| 加载页面 / 点击「刷新」 | `GET /api/history` |
-| 在搜索框输入关键字 | `GET /api/history?keyword=...` |
-| 点击某条记录的「删除」 | `DELETE /api/history/{id}` |
-| 点击「清空全部」 | `DELETE /api/history` |
-| 页面顶部的连接状态 | `GET /api/health` |
-| 历史面板右上角统计 | `GET /api/statistics` |
+| Pressing `=` or `Enter` | `POST /api/calculate` |
+| Loading the page or pressing "Refresh" | `GET /api/history` |
+| Typing into the search field | `GET /api/history?keyword=...` |
+| Pressing "Delete" on a record | `DELETE /api/history/{id}` |
+| Pressing "Clear all" | `DELETE /api/history` |
+| The indicator in the header | `GET /api/health` |
+| The statistics in the history header | `GET /api/statistics` |
 
-后端已开启 CORS，前端与后端可以分开部署在不同域名 / 端口下。
+CORS is enabled on the server, so the front end and the back end may be hosted on
+different domains or ports.
 
-## 七、功能说明
+## 7. Features
 
-### 基础功能
+### Mandatory features
 
-- 加减乘除四则运算（运算由后端完成）
-- 复合表达式与括号
-- 运算符优先级（由后端解析保证）
-- 一元正负号，如 `-5+8`、`3*-2`
-- 小数计算
-- 非法表达式的错误提示
-- 除零错误提示
-- 计算历史展示、删除指定记录
+- Addition, subtraction, multiplication and division, evaluated by the back end
+- Compound expressions and parentheses
+- Operator precedence, handled by the parser rather than by the client
+- Unary plus and minus, for example `-5+8` and `3*-2`
+- Decimal numbers
+- Error message for invalid expressions
+- Error message for division by zero
+- History display and deletion of an individual record
 
-### 扩展功能
+### Extended features
 
-- 科学计算按键面板（`sqrt`、`sin`、`cos`、`ln`、`log`、`fact`、`pow`、`hypot` 等）
-- 幂运算 `x^y`、取模 `%`、常量 `π` 与 `e`
-- 历史记录关键字搜索
-- 历史记录分页（每页 10 / 20 / 50 条可切换）
-- 一键清空全部历史
-- 点击历史表达式即可回填到输入框继续编辑
-- 计算统计（总记录数、今日记录数、最常用运算符）
-- 深色 / 浅色主题切换（记忆用户选择，并跟随系统偏好）
-- 键盘快捷键支持
-- 一键复制计算结果
+- Scientific keypad (`sqrt`, `sin`, `cos`, `tan`, `ln`, `log`, `abs`, `exp`, `n!`, `mod`, `min`, `max`, `pow`, `hypot`, `round`) with an expandable panel
+- Exponentiation `x^y`, modulo `%`, and the constants `π` and `e`
+- Keyword search over the history
+- Pagination of the history (10, 20 or 50 records per page)
+- Clearing the entire history in one action
+- Clicking a stored expression loads it back into the input field
+- Statistics: total records, records created today and the most frequently used operator
+- Light and dark themes, remembered between visits and following the system preference on first use
+- Keyboard shortcuts
+- One-click copying of the result
 
-### 键盘快捷键
+### Keyboard shortcuts
 
-| 按键 | 功能 |
+| Key | Action |
 | --- | --- |
-| `0`–`9`、`.`、`+`、`-`、`*`、`/`、`(`、`)`、`%`、`^`、`,` | 输入字符 |
-| `Enter` | 计算 |
-| `Backspace` | 退格 |
-| `Esc` | 清空输入 |
+| `0`–`9`, `.`, `+`, `-`, `*`, `/`, `(`, `)`, `%`, `^`, `,` | Insert the character |
+| `Enter` | Calculate |
+| `Backspace` | Delete one character |
+| `Esc` | Clear the input |
 
-## 八、项目结构
+## 8. Project Structure
 
 ```
 24126942_calculator_frontend/
 ├── src/
-│   ├── calculator.html        # 页面结构
+│   ├── calculator.html        # Page markup
 │   ├── css/
-│   │   └── style.css          # 样式与主题变量（BEM 命名）
+│   │   └── style.css          # Styling and theme variables (BEM naming)
 │   └── js/
-│       ├── config.js          # 后端地址配置
-│       ├── api.js             # 后端接口封装层
-│       └── app.js             # 界面交互逻辑
+│       ├── config.js          # API address configuration
+│       ├── api.js             # Thin wrapper around the back-end API
+│       └── app.js             # Interface behaviour
 ├── README.md
 └── codestyle.md
 ```
 
-三个 JS 文件职责清晰：`config.js` 只管配置，`api.js` 只管网络请求，
-`app.js` 只管界面交互，互不混杂。
+The three JavaScript files have clearly separated responsibilities: `config.js` holds the
+configuration, `api.js` performs the network calls and `app.js` drives the interface.
 
-## 九、测试建议
+## 9. Suggested Test Procedure
 
-评审时可按下述顺序验证：
+The following sequence is convenient when reviewing the submission:
 
-1. 启动后端，打开页面，确认右上角显示「后端已连接」；
-2. 依次验证 `12+8`、`9-15`、`6*7`、`10/4` 四种基础运算；
-3. 验证 `1+2*3` 与 `(1+2)*3`，确认优先级与括号生效；
-4. 验证 `3*-2`，确认一元负号生效；
-5. 验证 `5/0` 与 `1+*2`，确认错误提示来自后端；
-6. 刷新页面，确认历史记录仍然存在（数据来自后端数据库）；
-7. 点击某条记录的「删除」按钮，确认数据库中的记录被真正删除；
-8. **把后端服务停掉**，再点击 `=`，确认前端只能报错、无法独立得出结果。
+1. Start the back end, open the page and confirm that the header shows "Back end connected".
+2. Verify the four basic operations with `12+8`, `9-15`, `6*7` and `10/4`.
+3. Verify precedence and parentheses with `1+2*3` and `(1+2)*3`.
+4. Verify the unary minus with `3*-2`.
+5. Verify the error messages with `5/0` and `1+*2`; both messages come from the back end.
+6. Reload the page and confirm that the history is still there, because it is stored in
+   the back-end database rather than in the browser.
+7. Press "Delete" on a record and confirm that it really disappears from the database.
+8. **Stop the back-end service and press `=` again**: the client can only report an error,
+   which demonstrates that it cannot compute anything on its own.

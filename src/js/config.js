@@ -1,8 +1,8 @@
 /**
- * 前端配置文件：只需修改这里即可切换后端地址。
+ * Front-end configuration: change this file to point the page at another API.
  *
- * 优先级：URL 查询参数 ?api=http://xxx/api  >  本文件默认值
- * 例如部署到服务器后可以这样访问：
+ * Priority: URL query parameter ?api=http://host/api  >  default value below.
+ * Example after deployment:
  *   https://example.com/calculator.html?api=https://api.example.com/api
  */
 (function (global) {
@@ -18,7 +18,7 @@
       apiBase = fromQuery;
     }
   } catch (error) {
-    // 环境不支持 URLSearchParams 时静默回退到默认地址
+    // Fall back to the default when URLSearchParams is unavailable.
     apiBase = DEFAULT_API_BASE;
   }
 

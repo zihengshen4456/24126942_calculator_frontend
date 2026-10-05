@@ -1,8 +1,9 @@
 /**
- * 界面交互逻辑：按钮、键盘、历史记录渲染、主题切换。
+ * User interface logic: keypad, keyboard shortcuts, history rendering, theming.
  *
- * 设计原则：前端不做任何数学运算，输入什么表达式就原样发给后端，
- * 结果、历史、统计全部以后端返回的数据为准。
+ * Design rule: the front end performs no arithmetic at all. Whatever the user
+ * types is sent to the back end as-is, and the result, the history and the
+ * statistics are always taken from the API response.
  */
 (function (global, document) {
   'use strict';
@@ -20,6 +21,7 @@
 
   var elements = {};
 
+  // The keypad shows × ÷ − while the API uses * / -
   var OPERATOR_BUTTON_MAP = {
     '×': '*',
     '÷': '/',
@@ -27,7 +29,7 @@
   };
 
   /* ------------------------------------------------------------------ */
-  /* 初始化                                                              */
+  /* Bootstrap                                                          */
   /* ------------------------------------------------------------------ */
 
   function init() {
@@ -42,7 +44,7 @@
     checkBackendHealth();
     refreshHistory();
     refreshStatistics();
-    setMessage('提示：所有运算都由后端完成，请先启动后端服务。', 'info');
+    setMessage('All calculations are performed by the back end. Start it with: python run.py', 'info');
   }
 
   function cacheElements() {
@@ -67,7 +69,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 表达式输入                                                          */
+  /* Expression input                                                   */
   /* ------------------------------------------------------------------ */
 
   function setExpression(value) {
@@ -106,7 +108,7 @@
     setExpression('');
     elements.resultOutput.textContent = '—';
     state.lastResult = null;
-    setMessage('已清空输入。', 'info');
+    setMessage('Input cleared.', 'info');
     elements.expressionInput.focus();
   }
 
@@ -124,7 +126,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 按钮与键盘                                                          */
+  /* Keypad and keyboard                                                */
   /* ------------------------------------------------------------------ */
 
   function bindKeypadEvents() {
@@ -184,7 +186,7 @@
 
       var key = event.key;
       if (key >= '0' && key <= '9') {
-        return; // 交给输入框自身处理
+        return; // handled by the input element itself
       }
       if (['+', '-', '*', '/', '(', ')', '.', '%', '^', ','].indexOf(key) >= 0) {
         if (document.activeElement !== elements.expressionInput) {
@@ -207,30 +209,30 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 计算                                                                */
+  /* Calculation                                                        */
   /* ------------------------------------------------------------------ */
 
   async function calculate() {
     var expression = elements.expressionInput.value.trim();
     if (!expression) {
-      setMessage('请先输入要计算的表达式。', 'error');
+      setMessage('Please enter an expression first.', 'error');
       return;
     }
 
     setBusy(true);
-    setMessage('正在请求后端计算…', 'info');
+    setMessage('Requesting the result from the back end…', 'info');
     try {
       var payload = await Api.calculate(expression);
       elements.resultOutput.textContent = String(payload.result);
       state.lastResult = payload.result;
-      setMessage('计算成功：' + payload.expression + ' = ' + payload.result, 'success');
+      setMessage('Success: ' + payload.expression + ' = ' + payload.result, 'success');
       state.page = 1;
       refreshHistory();
       refreshStatistics();
     } catch (error) {
       elements.resultOutput.textContent = '—';
       state.lastResult = null;
-      setMessage('计算失败：' + error.message, 'error');
+      setMessage('Calculation failed: ' + error.message, 'error');
       if (error.code === 'NETWORK_ERROR') {
         setBackendStatus(false);
       }
@@ -245,23 +247,23 @@
 
   function copyResult() {
     if (state.lastResult === null) {
-      setMessage('还没有可复制的结果。', 'error');
+      setMessage('There is no result to copy yet.', 'error');
       return;
     }
     var text = String(state.lastResult);
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
-        setMessage('结果 ' + text + ' 已复制到剪贴板。', 'success');
+        setMessage('Result ' + text + ' copied to the clipboard.', 'success');
       }, function () {
-        setMessage('浏览器拒绝了剪贴板访问，请手动复制。', 'error');
+        setMessage('The browser denied clipboard access. Please copy manually.', 'error');
       });
     } else {
-      setMessage('当前浏览器不支持自动复制，请手动复制结果：' + text, 'info');
+      setMessage('Clipboard is not available in this browser. Result: ' + text, 'info');
     }
   }
 
   /* ------------------------------------------------------------------ */
-  /* 历史记录                                                            */
+  /* History                                                            */
   /* ------------------------------------------------------------------ */
 
   function bindHistoryEvents() {
@@ -300,7 +302,7 @@
       refreshHistory();
     });
 
-    // 事件委托：删除按钮与“点击表达式回填”
+    // Event delegation for the delete buttons and for reusing an expression
     elements.historyList.addEventListener('click', function (event) {
       var deleteButton = event.target.closest('[data-delete-id]');
       if (deleteButton) {
@@ -311,7 +313,7 @@
       if (reuseButton) {
         setExpression(reuseButton.getAttribute('data-reuse'));
         elements.expressionInput.focus();
-        setMessage('已把历史表达式填回输入框，可继续编辑。', 'info');
+        setMessage('Expression loaded back into the input field.', 'info');
       }
     });
   }
@@ -330,7 +332,7 @@
       renderHistory(payload);
     } catch (error) {
       elements.historyList.innerHTML =
-        '<li class="history__empty">历史记录加载失败：' + escapeHtml(error.message) + '</li>';
+        '<li class="history__empty">Could not load the history: ' + escapeHtml(error.message) + '</li>';
     }
   }
 
@@ -338,21 +340,23 @@
     var items = payload.items || [];
     if (items.length === 0) {
       elements.historyList.innerHTML = '<li class="history__empty">' +
-        (state.keyword ? '没有匹配「' + escapeHtml(state.keyword) + '」的历史记录。' : '暂无历史记录，先算一题试试。') +
+        (state.keyword
+          ? 'No history matches "' + escapeHtml(state.keyword) + '".'
+          : 'No history yet. Try a calculation.') +
         '</li>';
     } else {
       var html = items.map(function (item) {
         return '' +
           '<li class="history-item">' +
           '  <div class="history-item__main">' +
-          '    <button type="button" class="history-item__expression" data-reuse="' + escapeHtml(item.expression) + '" title="点击填回输入框">' + escapeHtml(item.expression) + '</button>' +
+          '    <button type="button" class="history-item__expression" data-reuse="' + escapeHtml(item.expression) + '" title="Click to load this expression">' + escapeHtml(item.expression) + '</button>' +
           '    <span class="history-item__equals">=</span>' +
           '    <span class="history-item__result">' + escapeHtml(item.result) + '</span>' +
           '  </div>' +
           '  <div class="history-item__meta">' +
           '    <span class="history-item__id">#' + item.id + '</span>' +
           '    <span class="history-item__time">' + escapeHtml(item.createdAt) + '</span>' +
-          '    <button type="button" class="button button--danger button--small" data-delete-id="' + item.id + '">删除</button>' +
+          '    <button type="button" class="button button--danger button--small" data-delete-id="' + item.id + '">Delete</button>' +
           '  </div>' +
           '</li>';
       }).join('');
@@ -361,42 +365,43 @@
 
     var totalPages = payload.totalPages || 0;
     var displayPage = totalPages === 0 ? 0 : payload.page;
-    elements.pageInfo.textContent = '第 ' + displayPage + ' / ' + totalPages + ' 页 · 共 ' + payload.total + ' 条';
+    elements.pageInfo.textContent =
+      'Page ' + displayPage + ' / ' + totalPages + ' · ' + payload.total + ' record(s)';
     elements.pagePrev.disabled = payload.page <= 1;
     elements.pageNext.disabled = totalPages === 0 || payload.page >= totalPages;
   }
 
   async function deleteRecord(id) {
-    if (!global.confirm('确定要删除第 ' + id + ' 条历史记录吗？')) {
+    if (!global.confirm('Delete history record #' + id + '?')) {
       return;
     }
     try {
       await Api.deleteHistory(id);
-      setMessage('历史记录 #' + id + ' 已从数据库删除。', 'success');
+      setMessage('History record #' + id + ' was deleted from the database.', 'success');
       refreshHistory();
       refreshStatistics();
     } catch (error) {
-      setMessage('删除失败：' + error.message, 'error');
+      setMessage('Delete failed: ' + error.message, 'error');
     }
   }
 
   async function clearAllHistory() {
-    if (!global.confirm('确定要清空全部历史记录吗？该操作会删除数据库中的所有记录。')) {
+    if (!global.confirm('Delete every history record? This removes all rows from the database.')) {
       return;
     }
     try {
       var payload = await Api.clearHistory();
-      setMessage(payload.message || '已清空历史记录。', 'success');
+      setMessage(payload.message || 'History cleared.', 'success');
       state.page = 1;
       refreshHistory();
       refreshStatistics();
     } catch (error) {
-      setMessage('清空失败：' + error.message, 'error');
+      setMessage('Clear failed: ' + error.message, 'error');
     }
   }
 
   /* ------------------------------------------------------------------ */
-  /* 统计与状态                                                          */
+  /* Statistics and connection status                                   */
   /* ------------------------------------------------------------------ */
 
   async function refreshStatistics() {
@@ -404,11 +409,11 @@
       var payload = await Api.getStatistics();
       var stats = payload.statistics;
       elements.historyStats.innerHTML =
-        '<span class="stat"><b>' + stats.total + '</b> 条记录</span>' +
-        '<span class="stat"><b>' + stats.today + '</b> 条今天</span>' +
-        '<span class="stat">最常用运算符 <b>' + escapeHtml(stats.mostUsedOperator || '—') + '</b></span>';
+        '<span class="stat"><b>' + stats.total + '</b> records</span>' +
+        '<span class="stat"><b>' + stats.today + '</b> today</span>' +
+        '<span class="stat">most used operator <b>' + escapeHtml(stats.mostUsedOperator || '—') + '</b></span>';
     } catch (error) {
-      elements.historyStats.textContent = '统计数据暂不可用';
+      elements.historyStats.textContent = 'Statistics unavailable';
     }
   }
 
@@ -418,7 +423,10 @@
       setBackendStatus(true);
     } catch (error) {
       setBackendStatus(false);
-      setMessage('检测到后端服务未启动，此时前端无法得到任何计算结果。请先运行后端：python run.py', 'error');
+      setMessage(
+        'The back-end service is not reachable, so the front end cannot produce any result on its own. Start it with: python run.py',
+        'error'
+      );
     }
     if (elements.apiBase) {
       elements.apiBase.textContent = Api.baseUrl;
@@ -426,12 +434,12 @@
   }
 
   function setBackendStatus(online) {
-    elements.status.textContent = online ? '后端已连接' : '后端未连接';
+    elements.status.textContent = online ? 'Back end connected' : 'Back end offline';
     elements.status.className = 'status ' + (online ? 'status--online' : 'status--offline');
   }
 
   /* ------------------------------------------------------------------ */
-  /* 主题                                                                */
+  /* Theme                                                              */
   /* ------------------------------------------------------------------ */
 
   function bindThemeEvents() {
@@ -441,7 +449,7 @@
       try {
         global.localStorage.setItem('calculator.theme', next);
       } catch (error) {
-        // 隐私模式下 localStorage 可能不可用，忽略即可
+        // localStorage can be unavailable in private browsing mode
       }
     });
   }
@@ -449,7 +457,7 @@
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     var isDark = theme === 'dark';
-    elements.themeToggle.textContent = isDark ? '☀️ 浅色' : '🌙 深色';
+    elements.themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
     elements.themeToggle.setAttribute('aria-pressed', String(isDark));
   }
 
@@ -469,7 +477,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 工具函数                                                            */
+  /* Helpers                                                            */
   /* ------------------------------------------------------------------ */
 
   function setMessage(text, type) {
@@ -488,7 +496,7 @@
 
   document.addEventListener('DOMContentLoaded', init);
 
-  // 供自动化测试与调试使用
+  // Exposed for automated tests and debugging
   global.CalculatorApp = {
     state: state,
     calculate: calculate,

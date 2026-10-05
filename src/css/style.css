@@ -1,6 +1,6 @@
 /**
- * 样式表（命名规范：BEM，Block__Element--Modifier）
- * 主题通过 html[data-theme] 上的 CSS 变量切换。
+ * Stylesheet. Class names follow the BEM convention (block__element--modifier).
+ * The colour theme is switched through CSS variables on html[data-theme].
  */
 
 :root {
@@ -47,7 +47,7 @@ body.app {
   margin: 0;
   min-height: 100vh;
   padding: 28px 20px 48px;
-  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   color: var(--color-text);
   background:
     radial-gradient(circle at 12% 0%, var(--color-bg-accent), transparent 46%),
@@ -63,7 +63,7 @@ code {
   font-size: 0.85em;
 }
 
-/* ---------------- 顶部 ---------------- */
+/* ---------------- Header ---------------- */
 
 .app__header {
   display: flex;
@@ -78,12 +78,12 @@ code {
 .app__title {
   margin: 0 0 6px;
   font-size: 26px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .app__subtitle {
   margin: 0;
-  max-width: 620px;
+  max-width: 640px;
   color: var(--color-text-muted);
   font-size: 14px;
   line-height: 1.6;
@@ -114,7 +114,7 @@ code {
   border-color: currentColor;
 }
 
-/* ---------------- 通用按钮 ---------------- */
+/* ---------------- Buttons ---------------- */
 
 .button {
   padding: 8px 14px;
@@ -162,11 +162,11 @@ code {
   color: var(--color-danger);
 }
 
-/* ---------------- 布局 ---------------- */
+/* ---------------- Layout ---------------- */
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(340px, 430px) minmax(360px, 1fr);
+  grid-template-columns: minmax(340px, 440px) minmax(360px, 1fr);
   gap: 22px;
   max-width: 1180px;
   margin: 0 auto;
@@ -192,7 +192,7 @@ code {
   font-size: 18px;
 }
 
-/* ---------------- 计算器 ---------------- */
+/* ---------------- Calculator ---------------- */
 
 .calculator__display {
   padding: 14px;
@@ -206,6 +206,7 @@ code {
   margin-bottom: 6px;
   font-size: 12px;
   letter-spacing: 1px;
+  text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
@@ -236,6 +237,8 @@ code {
 
 .calculator__result-label {
   font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: var(--color-text-muted);
 }
 
@@ -278,7 +281,7 @@ body.is-busy {
   cursor: progress;
 }
 
-/* 键盘 */
+/* Keypad */
 
 .calculator__keypad,
 .calculator__scientific {
@@ -293,7 +296,7 @@ body.is-busy {
   border-top: 1px dashed var(--color-border);
 }
 
-/* 类选择器的优先级高于浏览器默认的 [hidden]，必须显式声明才能隐藏 */
+/* A class selector outranks the browser default [hidden], so restate it here. */
 .calculator__scientific[hidden] {
   display: none;
 }
@@ -360,7 +363,7 @@ body.is-busy {
   color: var(--color-text-muted);
 }
 
-/* ---------------- 历史记录 ---------------- */
+/* ---------------- History ---------------- */
 
 .history {
   display: flex;

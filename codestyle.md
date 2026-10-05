@@ -1,128 +1,144 @@
-# 前端代码规范（HTML / CSS / JavaScript）
+# Front-End Code Standard (HTML / CSS / JavaScript)
 
-## 规范来源
+## Source of the Standard
 
-本文档的规则来源于以下公开的、被广泛认可的官方或社区标准：
+The rules in this document are derived from the following publicly available and widely
+recognised official or community standards:
 
-1. [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)（Google JavaScript 编码规范）
-2. [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript)（Airbnb JavaScript 编码规范）
-3. [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html)（Google HTML / CSS 编码规范）
-4. [MDN Web Docs – JavaScript 语言参考](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript)（语义与最佳实践）
-5. [Front-End Checklist – naming-conventions](https://github.com/thedaviddias/Front-End-Checklist)（前端命名与工程实践清单）
+1. [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html)
+2. [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript)
+3. [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html)
+4. [MDN Web Docs – JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+5. [Front-End Checklist – naming conventions](https://github.com/thedaviddias/Front-End-Checklist)
 
-本项目在上述通用规范的基础上，补充了少量与项目结构相关的约定。
+On top of those general standards, a small number of project-specific conventions are
+added below.
 
-## 1. 通用约定
+## 1. General Conventions
 
-| 项目 | 约定 |
+| Item | Convention |
 | --- | --- |
-| 缩进 | 2 个空格，禁止使用 Tab |
-| 行宽 | 单行不超过 100 个字符 |
-| 文件编码 | UTF-8（含中文的页面必须声明 `<meta charset="UTF-8">`） |
-| 大小写 | HTML 标签、属性、CSS 选择器统一使用小写 |
-| 文件结尾 | 保留一个空行 |
+| Indentation | 2 spaces; tabs are not permitted |
+| Line length | At most 100 characters per line |
+| File encoding | UTF-8; every page declares `<meta charset="UTF-8">` |
+| Case | HTML tags, attributes and CSS selectors are lowercase |
+| End of file | Exactly one trailing newline |
 
-## 2. HTML 规范
+## 2. HTML
 
-- 使用 HTML5 文档类型 `<!DOCTYPE html>`；
-- 为页面声明 `lang` 属性（本项目为 `zh-CN`）；
-- 标签必须正确闭合，属性值统一使用双引号；
-- 语义化优先：使用 `header`、`main`、`section`、`ul`、`button` 等语义标签，不滥用 `div`；
-- 交互元素使用 `<button type="button">`，表单控件必须有关联的 `<label>` 或 `aria-label`；
-- 图片必须提供 `alt` 属性；装饰性图标使用空 `alt=""`；
-- 可访问性：需要动态播报的区域使用 `role="status"` 与 `aria-live="polite"`，
-  可展开控件使用 `aria-expanded`。
+- Use the HTML5 doctype `<!DOCTYPE html>`;
+- declare the page language (`lang="en"` in this project);
+- close every tag and quote every attribute value with double quotes;
+- prefer semantic elements (`header`, `main`, `section`, `ul`, `button`) over `div`;
+- interactive elements are `<button type="button">`; form controls have an associated
+  `<label>` or an `aria-label`;
+- images always carry an `alt` attribute, and decorative icons use an empty `alt=""`;
+- for accessibility, dynamically announced regions use `role="status"` and
+  `aria-live="polite"`, and expandable controls use `aria-expanded`.
 
-## 3. CSS 规范
+## 3. CSS
 
-### 3.1 命名规范：BEM
+### 3.1 Naming: BEM
 
-类名采用 [BEM](https://getbem.com/)（Block__Element--Modifier）命名法：
+Class names follow the [BEM](https://getbem.com/) convention (block__element--modifier):
 
 ```
-.block              块：独立的功能单元，如 .calculator
-.block__element     元素：块的组成部分，如 .calculator__keypad
-.block--modifier    修饰符：状态或变体，如 .button--danger
+.block               an independent functional unit, such as .calculator
+.block__element      a part of a block, such as .calculator__keypad
+.block--modifier     a state or variant, such as .button--danger
 ```
 
-约定：
+Conventions:
 
-- 类名只使用小写字母、数字与连字符，禁止拼音与无意义缩写；
-- 禁止使用标签选择器或 `#id` 作为主要样式选择器（`#id` 仅用于 JS 取值）；
-- 禁止嵌套超过 2 层的选择器，避免样式难以覆盖与维护；
-- 状态类统一使用 `is-` 前缀，例如 `is-active`、`is-busy`。
+- class names use lowercase letters, digits and hyphens only;
+- tag selectors and `#id` selectors are not used for styling (`#id` is reserved for
+  JavaScript lookups);
+- nesting is limited to two levels so that rules stay easy to override;
+- state classes use the `is-` prefix, for example `is-active` and `is-busy`.
 
-### 3.2 其他规则
+### 3.2 Other Rules
 
-- 颜色、圆角、阴影等统一使用 CSS 变量（定义在 `:root` 中），主题切换只改变量，不改具体规则；
-- 属性书写顺序：定位 → 盒模型 → 排版 → 视觉 → 动画；
-- 数值为 0 时省略单位；小于 1 的小数省略整数部分的 0（如 `.5`）；
-- 避免使用 `!important`；`[hidden]` 之类的浏览器默认样式被覆盖时，
-  必须显式补充规则（本项目 `.calculator__scientific[hidden]` 即为此例）。
+- Colours, radii and shadows are declared once as CSS custom properties on `:root`;
+  switching a theme only reassigns those variables;
+- declaration order inside a rule is positioning, box model, typography, visual, animation;
+- zero values omit the unit, and decimals below one omit the leading zero;
+- `!important` is avoided; when a browser default such as `[hidden]` is overridden by a
+  class selector, the rule is restated explicitly (the project does this with
+  `.calculator__scientific[hidden]`).
 
-## 4. JavaScript 规范
+## 4. JavaScript
 
-### 4.1 基本格式
+### 4.1 Basic Formatting
 
-- 每条语句以分号结尾，字符串统一使用单引号；
-- 使用 `const` / `let`，禁止使用 `var`（本项目为兼容旧浏览器而在 IIFE 内使用了 `var`，
-  新增代码应优先使用 `const` / `let`）；
-- 使用严格模式：文件顶部或 IIFE 内添加 `'use strict';`；
-- 禁止使用全局变量污染，模块通过 IIFE 封装后挂载到统一的命名空间上。
+- Statements end with a semicolon and strings use single quotes;
+- `const` and `let` are preferred; `var` is only used inside the IIFEs of this project for
+  compatibility, and new code should use `const` / `let`;
+- strict mode is enabled with `'use strict';` at the top of every file or IIFE;
+- global variables are not created: modules are wrapped in an IIFE and expose a single
+  namespace object.
 
-### 4.2 命名
+### 4.2 Naming
 
-| 类型 | 规则 | 示例 |
+| Element | Convention | Example |
 | --- | --- | --- |
-| 变量 / 函数 | 小驼峰（camelCase） | `refreshHistory`、`pageSize` |
-| 常量 | 全大写加下划线 | `DEFAULT_API_BASE` |
-| 类 | 大驼峰（PascalCase） | `CalculatorApi` |
-| 布尔值 | 使用 `is` / `has` / `can` 前缀 | `isBusy`、`hasNext` |
-| 私有函数 | 文件内定义的普通函数即可 | `renderHistory` |
+| Variables and functions | camelCase | `refreshHistory`, `pageSize` |
+| Constants | UPPER_CASE_WITH_UNDERSCORES | `DEFAULT_API_BASE` |
+| Classes | PascalCase | `CalculatorApi` |
+| Booleans | `is` / `has` / `can` prefix | `isBusy`, `hasNext` |
 
-### 4.3 函数与异步
+### 4.3 Functions and Asynchrony
 
-- 单个函数尽量不超过 50 行，职责单一；
-- 异步请求统一使用 `async` / `await`，不使用回调嵌套；
-- 所有网络请求必须处理失败分支，禁止出现「静默失败」；
-- 错误对象要携带可判断的信息（如 `error.code`），便于界面区分处理。
+- A function stays below roughly 50 lines and has a single responsibility;
+- asynchronous work uses `async` / `await` rather than nested callbacks;
+- every network call handles its failure branch; silent failure is not acceptable;
+- error objects carry machine-readable information such as `error.code` so that the
+  interface can react differently to different failures.
 
-### 4.4 网络请求
+### 4.4 Network Requests
 
-- 所有接口调用集中封装在 `js/api.js` 中，界面逻辑不得直接调用 `fetch`；
-- 接口地址来自 `js/config.js`，不得在业务代码中硬编码 URL；
-- 请求统一携带 `Content-Type: application/json`；
-- 后端返回 `success: false` 或 HTTP 非 2xx 时，统一抛出异常，由界面层展示提示。
+- All endpoint calls are wrapped in `js/api.js`; interface code never calls `fetch`
+  directly;
+- the API address comes from `js/config.js` and is never hard-coded in business code;
+- requests set `Content-Type: application/json`;
+- a `success: false` payload or a non-2xx status is turned into an exception that the
+  interface layer reports to the user.
 
-### 4.5 DOM 操作与安全
+### 4.5 DOM Access and Safety
 
-- 通过 `document.getElementById` / `querySelector` 缓存 DOM 引用，避免重复查询；
-- 列表渲染使用事件委托，避免为每个列表项单独绑定事件；
-- **所有插入到 `innerHTML` 的数据都必须经过 HTML 转义**（本项目使用 `escapeHtml()`），
-  防止 XSS；
-- 用户输入不得直接拼接进 `innerHTML`。
+- DOM references are cached with `document.getElementById` / `querySelector` instead of
+  being queried repeatedly;
+- list rendering uses event delegation rather than one listener per item;
+- **every value inserted with `innerHTML` is escaped first** (this project uses
+  `escapeHtml()`), which prevents cross-site scripting;
+- user input is never concatenated into `innerHTML` directly.
 
-## 5. 注释规范
+## 5. Comments
 
-- 每个 JS 文件顶部说明该文件的职责；
-- 公开函数使用 JSDoc 风格注释说明参数与返回值；
-- 注释解释「为什么」，而不是重复代码字面含义；
-- 中文注释与英文标识符混排时，标识符保持英文，说明文字使用中文。
+- The top of every JavaScript file states the responsibility of that file;
+- public functions are documented in JSDoc style, describing parameters and return
+  values;
+- comments explain why something is done, not what the code literally says;
+- identifiers remain in English even when the surrounding documentation is not.
 
-## 6. 目录与文件组织
+## 6. File and Directory Organisation
 
-- 结构、样式、逻辑分离：HTML 不写内联样式与内联事件，CSS 不写业务逻辑，JS 不写样式；
-- 三个 JS 文件职责划分：`config.js` 配置、`api.js` 网络、`app.js` 交互；
-- 文件名全小写，多个单词用连字符或直接连写（如 `calculator.html`、`style.css`）。
+- Structure, styling and behaviour are separated: the HTML contains no inline style or
+  inline event handler, the CSS contains no logic and the JavaScript contains no styling;
+- the three JavaScript files are split as `config.js` (configuration), `api.js` (network)
+  and `app.js` (interface);
+- file names are lowercase.
 
-## 7. 可访问性与兼容性
+## 7. Accessibility and Compatibility
 
-- 所有可交互元素必须可以通过键盘操作（本项目支持数字、运算符、Enter、Backspace、Esc）；
-- 颜色对比度满足 WCAG AA 要求，深色主题同样适用；
-- 页面在 360px 移动端宽度至 1440px 桌面宽度下均能正常使用（响应式断点 900px）。
+- Every interactive control can be operated from the keyboard; this project supports the
+  digits, the operators, `Enter`, `Backspace` and `Esc`;
+- colour contrast meets WCAG AA in both the light and the dark theme;
+- the page is usable from 360px (mobile) to 1440px (desktop); the responsive breakpoint is
+  at 900px.
 
-## 8. 提交规范
+## 8. Committing
 
-- 提交信息使用简洁的祈使句；
-- 提交前在浏览器控制台确认无 JavaScript 报错、无 404 资源请求；
-- 不提交编辑器配置、临时文件与本地调试代码。
+- Commit messages are short imperative sentences;
+- the browser console must be free of JavaScript errors and failed resource requests
+  before committing;
+- editor configuration, temporary files and local debugging code are not committed.

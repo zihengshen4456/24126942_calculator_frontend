@@ -1,31 +1,32 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>在线计算器 · 前后端分离</title>
-  <meta name="description" content="前后端分离架构的在线计算器：前端负责交互，后端负责计算与历史记录持久化。">
+  <title>Online Calculator · Front-end / Back-end Separated</title>
+  <meta name="description" content="An online calculator built with a front-end / back-end separated architecture. The front end handles interaction, the back end performs every calculation and stores the history.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="app">
   <header class="app__header">
     <div class="app__intro">
-      <h1 class="app__title">在线计算器</h1>
+      <h1 class="app__title">Online Calculator</h1>
       <p class="app__subtitle">
-        前端只负责交互与展示，表达式解析、数学运算、历史记录持久化全部由后端 API 完成。
+        The front end only handles user input and presentation. Expression parsing, evaluation
+        and history persistence are all performed by the back-end API.
       </p>
     </div>
     <div class="app__actions">
-      <span id="connection-status" class="status status--unknown">正在检查后端…</span>
-      <button type="button" id="theme-toggle" class="button button--ghost" aria-pressed="false">🌙 深色</button>
+      <span id="connection-status" class="status status--unknown">Checking back end…</span>
+      <button type="button" id="theme-toggle" class="button button--ghost" aria-pressed="false">🌙 Dark</button>
     </div>
   </header>
 
   <main class="layout">
-    <!-- ---------------- 计算器 ---------------- -->
-    <section class="panel calculator" aria-label="计算器">
+    <!-- ---------------- Calculator ---------------- -->
+    <section class="panel calculator" aria-label="Calculator">
       <div class="calculator__display">
-        <label class="calculator__label" for="expression-input">表达式</label>
+        <label class="calculator__label" for="expression-input">Expression</label>
         <input
           id="expression-input"
           class="calculator__input"
@@ -33,19 +34,19 @@
           inputmode="text"
           autocomplete="off"
           spellcheck="false"
-          placeholder="例如：(1+2)*3 或 sqrt(16)+2^3">
+          placeholder="e.g. (1+2)*3 or sqrt(16)+2^3">
         <div class="calculator__result">
-          <span class="calculator__result-label">结果</span>
+          <span class="calculator__result-label">Result</span>
           <output id="result-output" class="calculator__result-value" for="expression-input">—</output>
-          <button type="button" id="copy-result" class="button button--ghost button--small">复制</button>
+          <button type="button" id="copy-result" class="button button--ghost button--small">Copy</button>
         </div>
       </div>
 
       <p id="message" class="message message--info" role="status" aria-live="polite"></p>
 
-      <div class="calculator__keypad" role="group" aria-label="计算器按键">
+      <div class="calculator__keypad" role="group" aria-label="Calculator keys">
         <button type="button" class="key key--function" data-action="clear">C</button>
-        <button type="button" class="key key--function" data-action="backspace" title="退格">⌫</button>
+        <button type="button" class="key key--function" data-action="backspace" title="Backspace">⌫</button>
         <button type="button" class="key key--function" data-insert="(">(</button>
         <button type="button" class="key key--function" data-insert=")">)</button>
 
@@ -69,7 +70,7 @@
         <button type="button" class="key key--operator" data-insert="%">%</button>
         <button type="button" class="key key--operator" data-insert="+">+</button>
 
-        <button type="button" class="key key--function" id="scientific-toggle" aria-expanded="false">科学 fx</button>
+        <button type="button" class="key key--function" id="scientific-toggle" aria-expanded="false">Sci fx</button>
         <button type="button" class="key key--function" data-insert="^">x^y</button>
         <button type="button" class="key key--function" data-insert="pi">π</button>
         <button type="button" class="key key--equals" data-action="calculate">=</button>
@@ -95,16 +96,16 @@
       </div>
 
       <p class="calculator__hint">
-        键盘快捷键：数字与 <code>+ - * / ( ) . % ^</code> 直接输入，<code>Enter</code> 计算，
-        <code>Backspace</code> 退格，<code>Esc</code> 清空。
+        Keyboard: digits and <code>+ - * / ( ) . % ^</code> are typed directly,
+        <code>Enter</code> calculates, <code>Backspace</code> deletes, <code>Esc</code> clears.
       </p>
     </section>
 
-    <!-- ---------------- 历史记录 ---------------- -->
-    <section class="panel history" aria-label="计算历史">
+    <!-- ---------------- History ---------------- -->
+    <section class="panel history" aria-label="Calculation history">
       <div class="history__header">
-        <h2 class="panel__title">计算历史</h2>
-        <div class="history__stats" id="history-stats">统计数据加载中…</div>
+        <h2 class="panel__title">Calculation history</h2>
+        <div class="history__stats" id="history-stats">Loading statistics…</div>
       </div>
 
       <div class="history__toolbar">
@@ -112,33 +113,32 @@
           id="history-search"
           class="history__search"
           type="search"
-          placeholder="搜索表达式或结果…"
-          aria-label="搜索历史记录">
-        <button type="button" id="history-refresh" class="button">刷新</button>
-        <button type="button" id="history-clear" class="button button--danger">清空全部</button>
+          placeholder="Search expressions or results…"
+          aria-label="Search history">
+        <button type="button" id="history-refresh" class="button">Refresh</button>
+        <button type="button" id="history-clear" class="button button--danger">Clear all</button>
       </div>
 
       <ul class="history__list" id="history-list">
-        <li class="history__empty">历史记录加载中…</li>
+        <li class="history__empty">Loading history…</li>
       </ul>
 
       <div class="history__pager">
-        <button type="button" id="page-prev" class="button button--small">上一页</button>
-        <span id="page-info" class="history__page-info">第 0 / 0 页</span>
-        <button type="button" id="page-next" class="button button--small">下一页</button>
+        <button type="button" id="page-prev" class="button button--small">Previous</button>
+        <span id="page-info" class="history__page-info">Page 0 / 0</span>
+        <button type="button" id="page-next" class="button button--small">Next</button>
         <label class="history__page-size">
-          每页
           <select id="page-size">
             <option value="10" selected>10</option>
             <option value="20">20</option>
             <option value="50">50</option>
           </select>
-          条
+          per page
         </label>
       </div>
 
       <p class="history__footer">
-        数据来源：后端 SQLite 数据库 · 接口地址 <code id="api-base">—</code>
+        Data source: back-end SQLite database · API base <code id="api-base">—</code>
       </p>
     </section>
   </main>
