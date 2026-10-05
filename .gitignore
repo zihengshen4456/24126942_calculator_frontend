@@ -1,0 +1,9 @@
+# 编辑器与系统文件
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 依赖与构建产物（本项目零依赖，保留以防后续引入工具链）
+node_modules/
+dist/
